@@ -11,16 +11,20 @@ function Snake() {
   this.direction = Direction.RIGHT;
 
   this.turnLeft = function() {
-    this.direction = Direction.LEFT;
+    if (this.direction !== Direction.RIGHT)
+      this.direction = Direction.LEFT;
   }
   this.turnRight = function() {
-    this.direction = Direction.RIGHT;
+    if (this.direction !== Direction.LEFT)
+      this.direction = Direction.RIGHT;
   }
   this.turnUp = function() {
-    this.direction = Direction.UP;
+    if (this.direction !== Direction.DOWN)
+      this.direction = Direction.UP;
   }
   this.turnDown = function() {
-    this.direction = Direction.DOWN;
+    if (this.direction !== Direction.UP)
+      this.direction = Direction.DOWN;
   }
 }
 
