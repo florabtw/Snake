@@ -34,10 +34,16 @@ function Snake() {
   }
 }
 
+function Apple(canvas) {
+  this.x = Math.random() * (canvas.width - 10);
+  this.y = Math.random() * (canvas.height - 10);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.querySelector('#screen');
   var context =  canvas.getContext('2d');
   var snake = new Snake();
+  var apple = new Apple(canvas);
 
   // responsive canvas
   window.addEventListener('resize', resizeCanvas, false);
@@ -46,10 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    if (apple.x > canvas.width - 10 || apple.y > canvas.height - 10) {
+      apple = new Apple(canvas);
+    }
+
     drawSnake();
   }
 
   resizeCanvas();
+  apple = new Apple(canvas);
 
   // game loop timing
   if (window.requestAnimationFrame !== null) {
@@ -110,8 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function drawSnake() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    // draw snake
     for (i = 0; i < snake.points.length; i++) {
       context.fillRect(snake.points[i].x, snake.points[i].y, 10, 10);
     }
+
+    // draw apple
+    context.fillRect(apple.x, apple.y, 10, 10);
   }
 });
