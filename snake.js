@@ -7,10 +7,13 @@ var Direction = {
   DOWN: 3
 }
 
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
 function Snake() {
-  this.x = 0;
-  this.y = 0;
-  this.speed = 200; // pixels per second
+  this.points = [new Point(50, 50), new Point(40, 50), new Point(30, 50)];
   this.direction = Direction.RIGHT;
 
   this.turnLeft = function() {
@@ -82,25 +85,33 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateSnake() {
     var newTime = Date.now();
 
-    // seconds since last draw
-    var timeDelta = (newTime - time) / 1000;
-    time = newTime;
+    if (newTime - time > 50) {
+      time = newTime;
 
-    var distance = timeDelta * snake.speed;
+      // update all but head of snake
+      for (i = snake.points.length - 1; i > 0; i--) {
+        snake.points[i].x = snake.points[i-1].x;
+        snake.points[i].y = snake.points[i-1].y;
+      }
 
-    if (snake.direction === Direction.LEFT) {
-      snake.x -= distance;
-    } else if (snake.direction === Direction.RIGHT) {
-      snake.x += distance;
-    } else if (snake.direction === Direction.UP) {
-      snake.y -= distance;
-    } else {
-      snake.y += distance;
+      // update head
+      if (snake.direction === Direction.LEFT) {
+        snake.points[0].x -= 10;
+      } else if (snake.direction === Direction.RIGHT) {
+        snake.points[0].x += 10;
+      } else if (snake.direction === Direction.UP) {
+        snake.points[0].y -= 10;
+      } else {
+        snake.points[0].y += 10;
+      }
     }
   }
 
   function drawSnake() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(snake.x, snake.y, 10, 10);
+
+    for (i = 0; i < snake.points.length; i++) {
+      context.fillRect(snake.points[i].x, snake.points[i].y, 10, 10);
+    }
   }
 });
