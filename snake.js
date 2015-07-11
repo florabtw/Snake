@@ -1,3 +1,5 @@
+var time = Date.now();
+
 var Direction = {
   LEFT: 0,
   RIGHT: 1,
@@ -8,6 +10,7 @@ var Direction = {
 function Snake() {
   this.x = 0;
   this.y = 0;
+  this.speed = 200; // pixels per second
   this.direction = Direction.RIGHT;
 
   this.turnLeft = function() {
@@ -46,7 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
   resizeCanvas();
 
   // game loop timing
-  setInterval(mainloop, 1000.0 / 10);
+  if (window.requestAnimationFrame !== null) {
+    var recursiveAnim = function() {
+      mainloop();
+      window.requestAnimationFrame(recursiveAnim);
+    };
+
+    window.requestAnimationFrame(recursiveAnim);
+  } else {
+    setInterval(mainloop, 1000.0 / 60);
+  }
 
   // handle keypress events
   window.addEventListener('keydown', keyPress, false);
@@ -68,14 +80,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function updateSnake() {
+    var newTime = Date.now();
+
+    // seconds since last draw
+    var timeDelta = (newTime - time) / 1000;
+    time = newTime;
+
+    var distance = timeDelta * snake.speed;
+
     if (snake.direction === Direction.LEFT) {
-      snake.x -= 10;
+      snake.x -= distance;
     } else if (snake.direction === Direction.RIGHT) {
-      snake.x += 10;
+      snake.x += distance;
     } else if (snake.direction === Direction.UP) {
-      snake.y -= 10;
+      snake.y -= distance;
     } else {
-      snake.y += 10;
+      snake.y += distance;
     }
   }
 
