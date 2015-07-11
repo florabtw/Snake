@@ -16,27 +16,45 @@ function Snake() {
   this.points = [new Point(50, 50), new Point(40, 50), new Point(30, 50)];
   this.direction = Direction.RIGHT;
 
+  this.headCollidesWith = function(apple){
+    var head = this.points[0];
+    return head.x === apple.x && head.y === apple.y;
+  };
+
   this.turnLeft = function() {
     if (this.direction !== Direction.RIGHT)
       this.direction = Direction.LEFT;
-  }
+  };
+
   this.turnRight = function() {
     if (this.direction !== Direction.LEFT)
       this.direction = Direction.RIGHT;
-  }
+  };
+
   this.turnUp = function() {
     if (this.direction !== Direction.DOWN)
       this.direction = Direction.UP;
-  }
+  };
+
   this.turnDown = function() {
     if (this.direction !== Direction.UP)
       this.direction = Direction.DOWN;
-  }
+  };
 }
 
 function Apple(canvas) {
-  this.x = Math.random() * (canvas.width - 10);
-  this.y = Math.random() * (canvas.height - 10);
+  this.x = generateX();
+  this.y = generateY();
+
+  function generateX() {
+    var x = Math.random() * (canvas.width - 10);
+    return Math.round(x / 10) * 10;
+  }
+
+  function generateY() {
+    var y = Math.random() * (canvas.height - 10);
+    return Math.round(y / 10) * 10;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -98,6 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (newTime - time > 50) {
       time = newTime;
+
+      if (snake.headCollidesWith(apple)) {
+        var last = snake.points[snake.points.length-1];
+        snake.points.push(new Point(last.x, last.y));
+
+        apple = new Apple(canvas);
+      }
 
       // update all but head of snake
       for (i = snake.points.length - 1; i > 0; i--) {
