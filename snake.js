@@ -1,7 +1,35 @@
+var Direction = {
+  LEFT: 0,
+  RIGHT: 1,
+  UP: 2,
+  DOWN: 3
+}
+
+function Snake() {
+  this.x = 0;
+  this.y = 0;
+  this.direction = Direction.RIGHT;
+
+  this.turnLeft = function() {
+    this.direction = Direction.LEFT;
+  }
+  this.turnRight = function() {
+    this.direction = Direction.RIGHT;
+  }
+  this.turnUp = function() {
+    this.direction = Direction.UP;
+  }
+  this.turnDown = function() {
+    this.direction = Direction.DOWN;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.querySelector('#screen');
   var context =  canvas.getContext('2d');
+  var snake = new Snake();
 
+  // responsive canvas
   window.addEventListener('resize', resizeCanvas, false);
 
   function resizeCanvas() {
@@ -13,33 +41,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
   resizeCanvas();
 
-  if (window.requestAnimationFrame !== null) {
-    var recursiveAnim = function() {
-      mainloop();
-      window.requestAnimationFrame(recursiveAnim);
-    };
+  // game loop timing
+  setInterval(mainloop, 1000.0 / 10);
 
-    window.requestAnimationFrame(recursiveAnim);
-  } else {
-    setInterval(mainloop, 1000.0 / 60.0);
+  // handle keypress events
+  window.addEventListener('keydown', keyPress, false);
+
+  function keyPress(e) {
+    var code = e.keyCode;
+    switch (code) {
+      case 37: snake.turnLeft(); break;
+      case 38: snake.turnUp(); break;
+      case 39: snake.turnRight(); break;
+      case 40: snake.turnDown(); break;
+    }
   }
 
-  var point = 0;
+  // game loop
   function mainloop() {
     updateSnake();
     drawSnake();
   }
 
   function updateSnake() {
-    if (point >= canvas.width || point >= canvas.height) {
-      point = 0;
+    if (snake.direction === Direction.LEFT) {
+      snake.x -= 10;
+    } else if (snake.direction === Direction.RIGHT) {
+      snake.x += 10;
+    } else if (snake.direction === Direction.UP) {
+      snake.y -= 10;
     } else {
-      point++;
+      snake.y += 10;
     }
   }
 
   function drawSnake() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(point, point, 10, 10);
+    context.fillRect(snake.x, snake.y, 10, 10);
   }
 });
