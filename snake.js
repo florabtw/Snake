@@ -1,3 +1,5 @@
+const BLOCK_SIZE = 10;
+
 var Direction = {
   LEFT: 0,
   RIGHT: 1,
@@ -73,8 +75,7 @@ function Score() {
 }
 
 function Snake() {
-  // TODO snake should start near center of canvas
-  this.points = [new Point(50, 50)];
+  this.points = [new Point(BLOCK_SIZE, BLOCK_SIZE)];
   this.direction = Direction.RIGHT;
 
   var snake = this;
@@ -86,8 +87,8 @@ function Snake() {
 
   this.headCollidesWithWall = function(canvas) {
     var head = this.points[0];
-    var xCollides = 0 > head.x || head.x > canvas.width - 10;
-    var yCollides = 0 > head.y || head.y > canvas.height - 10;
+    var xCollides = 0 > head.x || head.x > canvas.width - BLOCK_SIZE;
+    var yCollides = 0 > head.y || head.y > canvas.height - BLOCK_SIZE;
     return xCollides || yCollides;
   };
 
@@ -145,7 +146,7 @@ function Snake() {
     context.fillStyle = 'black';
 
     for (i = 0; i < this.points.length; i++) {
-      context.fillRect(this.points[i].x, this.points[i].y, 10, 10);
+      context.fillRect(this.points[i].x, this.points[i].y, BLOCK_SIZE, BLOCK_SIZE);
     }
   };
 }
@@ -160,17 +161,17 @@ function Apple(canvas) {
   };
 
   function generateX() {
-    var x = Math.random() * (canvas.width - 10);
-    return Math.round(x / 10) * 10;
+    var x = Math.random() * (canvas.width - BLOCK_SIZE);
+    return Math.round(x / BLOCK_SIZE) * BLOCK_SIZE;
   }
 
   function generateY() {
-    var y = Math.random() * (canvas.height - 10);
-    return Math.round(y / 10) * 10;
+    var y = Math.random() * (canvas.height - BLOCK_SIZE);
+    return Math.round(y / BLOCK_SIZE) * BLOCK_SIZE;
   }
 
   this.draw = function(context) {
-    context.fillRect(this.x, this.y, 10, 10);
+    context.fillRect(this.x, this.y, BLOCK_SIZE, BLOCK_SIZE);
   };
 }
 
@@ -186,7 +187,10 @@ function SnakeGame(canvas) {
   var gameOver = false;
 
   this.resize = function() {
-    if (apple.x > canvas.width - 10 || apple.y > canvas.height - 10) {
+    var appleOutsideX = apple.x > canvas.width - BLOCK_SIZE;
+    var appleOutsideY = apple.y > canvas.height - BLOCK_SIZE;
+
+    if (appleOutsideX || appleOutsideY) {
       apple.move();
     }
 
@@ -253,13 +257,13 @@ function SnakeGame(canvas) {
 
       // update head
       if (snake.direction === Direction.LEFT) {
-        snake.points[0].x -= 10;
+        snake.points[0].x -= BLOCK_SIZE;
       } else if (snake.direction === Direction.RIGHT) {
-        snake.points[0].x += 10;
+        snake.points[0].x += BLOCK_SIZE;
       } else if (snake.direction === Direction.UP) {
-        snake.points[0].y -= 10;
+        snake.points[0].y -= BLOCK_SIZE;
       } else {
-        snake.points[0].y += 10;
+        snake.points[0].y += BLOCK_SIZE;
       }
 
       if (snake.headCollidesWithWall(canvas) || snake.headCollidesWithSelf()) {
