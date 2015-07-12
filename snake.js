@@ -71,6 +71,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var snake = new Snake();
   var apple = new Apple(canvas);
 
+  // reset button
+  var resetButton = document.querySelector('#reset');
+  resetButton.onclick = function() {
+    gameOver = false;
+    time = Date.now();
+
+    snake = new Snake();
+    apple = new Apple(canvas);
+  }
+
   // responsive canvas
   window.addEventListener('resize', resizeCanvas, false);
 
