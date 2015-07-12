@@ -52,6 +52,26 @@ function ResetButton(canvas, game) {
   };
 }
 
+function Score() {
+  this.score = 0;
+
+  this.reset = function() {
+    this.score = 0;
+  }
+
+  this.increment = function() {
+    this.score++;
+  }
+
+  this.draw = function(context) {
+    context.font = 'bold 36px sans-serif';
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    context.fillText('Score: ' + this.score, 10, 10);
+  }
+}
+
 function Snake() {
   // TODO snake should start near center of canvas
   this.points = [new Point(50, 50)];
@@ -137,12 +157,12 @@ function SnakeGame(canvas) {
   var snake = new Snake();
   var apple = new Apple(canvas);
   var btnReset = new ResetButton(canvas, this);
+  var score = new Score();
 
   var context = canvas.getContext('2d');
 
   var time = Date.now();
   var gameOver = false;
-  var score = 0;
 
   this.resize = function() {
     if (apple.x > canvas.width - 10 || apple.y > canvas.height - 10) {
@@ -157,10 +177,10 @@ function SnakeGame(canvas) {
   this.reset = function() {
     gameOver = false;
     time = Date.now();
-    score = 0;
 
     snake = new Snake();
     apple.move();
+    score.reset();
   };
 
   this.play = function() {
@@ -210,7 +230,7 @@ function SnakeGame(canvas) {
         var last = snake.points[snake.points.length-1];
         snake.points.push(new Point(last.x, last.y));
 
-        score++;
+        score.increment();
 
         apple.move();
       }
@@ -245,12 +265,7 @@ function SnakeGame(canvas) {
 
     apple.draw(context);
 
-    // draw score
-    context.font = 'bold 36px sans-serif';
-    context.textAlign = 'left';
-    context.textBaseline = 'top';
-    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    context.fillText('Score: ' + score, 10, 10);
+    score.draw(context);
 
     btnReset.draw(context);
   }
