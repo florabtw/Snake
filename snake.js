@@ -1,150 +1,192 @@
-var time = Date.now();
-var gameOver = false;
-var score = 0;
+function SnakeGame(canvas) {
+  var Direction = {
+    LEFT: 0,
+    RIGHT: 1,
+    UP: 2,
+    DOWN: 3
+  }
 
-var Direction = {
-  LEFT: 0,
-  RIGHT: 1,
-  UP: 2,
-  DOWN: 3
-}
+  var context = canvas.getContext('2d');
+  var snake = new Snake();
+  var apple = new Apple(canvas);
+  var btnReset = new ResetButton();
 
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
-}
+  var time = Date.now();
+  var gameOver = false;
+  var score = 0;
 
-function Snake() {
-  this.points = [new Point(50, 50)];
-  this.direction = Direction.RIGHT;
+  function Point(x, y) {
+    this.x = x;
+    this.y = y;
+  }
 
-  this.headCollidesWithWall = function(canvas) {
-    var head = this.points[0];
-    var xCollides = 0 > head.x || head.x > canvas.width - 10;
-    var yCollides = 0 > head.y || head.y > canvas.height - 10;
-    return xCollides || yCollides;
-  };
+  function ResetButton() {
+    this.x = 10;
+    this.y = canvas.height - 50;
+    this.width = 100;
+    this.height = 40;
 
-  this.headCollidesWithSelf = function() {
-    var head = this.points[0];
-    for (i = 1; i < this.points.length; i++) {
-      if (head.x == this.points[i].x && head.y == this.points[i].y) {
-        return true;
+    var btn = this;
+
+    this.updateLocation = function() {
+      this.y = canvas.height - 50;
+    }
+
+    function checkForCollision(e) {
+      var eventX = e.pageX - canvas.offsetLeft;
+      var eventY = e.pageY - canvas.offsetTop;
+
+      var xCollides = btn.x <= eventX && eventX <= btn.x + btn.width;
+      var yCollides = btn.y <= eventY && eventY <= btn.y + btn.height;
+
+      if (xCollides && yCollides) {
+        reset();
       }
     }
 
-    return false;
+    this.listen = function() {
+      window.addEventListener('mousedown', checkForCollision, false);
+    }
+
+    this.draw = function(context) {
+      context.fillRect(this.x, this.y, this.width, this.height);
+
+      context.font = '16px sans-serif';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = '#333';
+
+      var centerX = this.x + (this.width / 2);
+      var centerY = this.y + (this.height / 2);
+      context.fillText('Reset', centerX, centerY);
+    }
   }
 
-  this.headCollidesWithApple = function(apple){
-    var head = this.points[0];
-    return head.x === apple.x && head.y === apple.y;
-  };
+  function Snake() {
+    this.points = [new Point(50, 50)];
+    this.direction = Direction.RIGHT;
 
-  this.turnLeft = function() {
-    if (this.direction !== Direction.RIGHT)
-      this.direction = Direction.LEFT;
-  };
+    this.headCollidesWithWall = function(canvas) {
+      var head = this.points[0];
+      var xCollides = 0 > head.x || head.x > canvas.width - 10;
+      var yCollides = 0 > head.y || head.y > canvas.height - 10;
+      return xCollides || yCollides;
+    };
 
-  this.turnRight = function() {
-    if (this.direction !== Direction.LEFT)
-      this.direction = Direction.RIGHT;
-  };
+    this.headCollidesWithSelf = function() {
+      var head = this.points[0];
+      for (i = 1; i < this.points.length; i++) {
+        if (head.x == this.points[i].x && head.y == this.points[i].y) {
+          return true;
+        }
+      }
 
-  this.turnUp = function() {
-    if (this.direction !== Direction.DOWN)
-      this.direction = Direction.UP;
-  };
+      return false;
+    }
 
-  this.turnDown = function() {
-    if (this.direction !== Direction.UP)
-      this.direction = Direction.DOWN;
-  };
-}
+    this.headCollidesWithApple = function(apple){
+      var head = this.points[0];
+      return head.x === apple.x && head.y === apple.y;
+    };
 
-function Apple(canvas) {
-  this.x = generateX();
-  this.y = generateY();
+    this.turnLeft = function() {
+      if (this.direction !== Direction.RIGHT)
+        this.direction = Direction.LEFT;
+    };
 
-  function generateX() {
-    var x = Math.random() * (canvas.width - 10);
-    return Math.round(x / 10) * 10;
+    this.turnRight = function() {
+      if (this.direction !== Direction.LEFT)
+        this.direction = Direction.RIGHT;
+    };
+
+    this.turnUp = function() {
+      if (this.direction !== Direction.DOWN)
+        this.direction = Direction.UP;
+    };
+
+    this.turnDown = function() {
+      if (this.direction !== Direction.UP)
+        this.direction = Direction.DOWN;
+    };
   }
 
-  function generateY() {
-    var y = Math.random() * (canvas.height - 10);
-    return Math.round(y / 10) * 10;
+  function Apple(canvas) {
+    this.x = generateX();
+    this.y = generateY();
+
+    this.move = function() {
+      this.x = generateX();
+      this.y = generateY();
+    }
+
+    function generateX() {
+      var x = Math.random() * (canvas.width - 10);
+      return Math.round(x / 10) * 10;
+    }
+
+    function generateY() {
+      var y = Math.random() * (canvas.height - 10);
+      return Math.round(y / 10) * 10;
+    }
   }
-}
 
-document.addEventListener('DOMContentLoaded', function() {
-  var canvas = document.querySelector('#screen');
-  var context =  canvas.getContext('2d');
-  var snake = new Snake();
-  var apple = new Apple(canvas);
+  this.resize = function() {
+    if (apple.x > canvas.width - 10 || apple.y > canvas.height - 10) {
+      apple.move();
+    }
 
-  // reset button
-  var resetButton = document.querySelector('#reset');
-  resetButton.onclick = function() {
+    btnReset.updateLocation();
+
+    drawSnake(context, snake, apple);
+  }
+
+  function reset() {
     gameOver = false;
     time = Date.now();
     score = 0;
 
     snake = new Snake();
-    apple = new Apple(canvas);
+    apple.move();
   }
 
-  // responsive canvas
-  window.addEventListener('resize', resizeCanvas, false);
+  this.play = function() {
+    // listen for reset button
+    btnReset.listen();
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    if (apple.x > canvas.width - 10 || apple.y > canvas.height - 10) {
-      apple = new Apple(canvas);
+    // listen for key presses
+    window.addEventListener('keydown', keyPress, false);
+    function keyPress(e) {
+      var code = e.keyCode;
+      switch (code) {
+        case 37: snake.turnLeft(); break;
+        case 38: snake.turnUp(); break;
+        case 39: snake.turnRight(); break;
+        case 40: snake.turnDown(); break;
+      }
     }
 
-    drawSnake();
-  }
+    // game loop timing
+    if (window.requestAnimationFrame !== null) {
+      var recursiveAnim = function() {
+        mainloop();
+        window.requestAnimationFrame(recursiveAnim);
+      };
 
-  resizeCanvas();
-  apple = new Apple(canvas);
-
-  // game loop timing
-  if (window.requestAnimationFrame !== null) {
-    var recursiveAnim = function() {
-      mainloop();
       window.requestAnimationFrame(recursiveAnim);
-    };
+    } else {
+      setInterval(mainloop, 1000.0 / 60);
+    }
 
-    window.requestAnimationFrame(recursiveAnim);
-  } else {
-    setInterval(mainloop, 1000.0 / 60);
-  }
-
-  // handle keypress events
-  window.addEventListener('keydown', keyPress, false);
-
-  function keyPress(e) {
-    var code = e.keyCode;
-    switch (code) {
-      case 37: snake.turnLeft(); break;
-      case 38: snake.turnUp(); break;
-      case 39: snake.turnRight(); break;
-      case 40: snake.turnDown(); break;
+    // game loop
+    function mainloop() {
+      if (!gameOver) {
+        updateSnake(snake, apple);
+        drawSnake(context, snake, apple);
+      }
     }
   }
 
-  // game loop
-  function mainloop() {
-    if (!gameOver) {
-      updateSnake();
-      drawSnake();
-    }
-  }
-
-  function updateSnake() {
+  function updateSnake(snake, apple) {
     var newTime = Date.now();
 
     if (newTime - time > 50) {
@@ -156,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         score++;
 
-        apple = new Apple(canvas);
+        apple.move();
       }
 
       // update all but head of snake
@@ -182,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  function drawSnake() {
+  function drawSnake(context, snake, apple) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     context.fillStyle = 'black';
@@ -197,7 +239,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // draw score
     context.font = 'bold 36px sans-serif';
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
     context.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    context.fillText('Score: ' + score, 10, 41);
+    context.fillText('Score: ' + score, 10, 10);
+
+    // draw reset button
+    btnReset.draw(context);
   }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var canvas = document.querySelector('#screen');
+
+  var game = new SnakeGame(canvas);
+  game.play();
+
+  window.addEventListener('resize', resizeCanvas, false);
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    game.resize();
+  }
+
+  resizeCanvas();
 });
