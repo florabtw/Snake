@@ -1,5 +1,6 @@
 var time = Date.now();
 var gameOver = false;
+var score = 0;
 
 var Direction = {
   LEFT: 0,
@@ -76,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
   resetButton.onclick = function() {
     gameOver = false;
     time = Date.now();
+    score = 0;
 
     snake = new Snake();
     apple = new Apple(canvas);
@@ -141,6 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var last = snake.points[snake.points.length-1];
         snake.points.push(new Point(last.x, last.y));
 
+        score++;
+
         apple = new Apple(canvas);
       }
 
@@ -170,6 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function drawSnake() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    context.fillStyle = 'black';
+
     // draw snake
     for (i = 0; i < snake.points.length; i++) {
       context.fillRect(snake.points[i].x, snake.points[i].y, 10, 10);
@@ -177,5 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // draw apple
     context.fillRect(apple.x, apple.y, 10, 10);
+
+    // draw score
+    context.font = 'bold 36px sans-serif';
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    context.fillText('Score: ' + score, 10, 41);
   }
 });
