@@ -15,7 +15,7 @@ function Point(x, y) {
 }
 
 function Snake() {
-  this.points = [new Point(50, 50), new Point(40, 50), new Point(30, 50)];
+  this.points = [new Point(50, 50)];
   this.direction = Direction.RIGHT;
 
   this.headCollidesWithWall = function(canvas) {
