@@ -25,6 +25,17 @@ function Snake() {
     return xCollides || yCollides;
   };
 
+  this.headCollidesWithSelf = function() {
+    var head = this.points[0];
+    for (i = 1; i < this.points.length; i++) {
+      if (head.x == this.points[i].x && head.y == this.points[i].y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   this.headCollidesWithApple = function(apple){
     var head = this.points[0];
     return head.x === apple.x && head.y === apple.y;
@@ -165,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
         snake.points[0].y += 10;
       }
 
-      if (snake.headCollidesWithWall(canvas)) {
+      if (snake.headCollidesWithWall(canvas) || snake.headCollidesWithSelf()) {
         gameOver = true;
       }
     }
