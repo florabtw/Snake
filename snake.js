@@ -12,6 +12,81 @@ function Point(x, y) {
   this.y = y;
 }
 
+function Controls(canvas) {
+  const SIZE = 50;
+  const GAP = 5;
+
+  var left, right, up, down;
+
+  var listener = null;
+
+  this.updateLocation = function() {
+    left  = new Point(canvas.width - SIZE * 3 - GAP * 3,
+                      canvas.height - SIZE - GAP);
+    down  = new Point(canvas.width - SIZE * 2 - GAP * 2,
+                      canvas.height - SIZE - GAP);
+    right = new Point(canvas.width - SIZE - GAP,
+                      canvas.height - SIZE - GAP);
+    up    = new Point(canvas.width - SIZE * 2 - GAP * 2,
+                      canvas.height - SIZE * 2 - GAP * 2);
+  }
+  this.updateLocation();
+
+  this.register = function(newListener) {
+    listener = newListener;
+  }
+
+  this.listen = function() {
+    window.addEventListener('mousedown', checkForClick, false);
+  }
+
+  function checkForClick(e) {
+    var eventX = e.pageX - canvas.offsetLeft;
+    var eventY = e.pageY - canvas.offsetTop;
+
+    if (collidesWithLeft(eventX, eventY)) {
+      listener.turnLeft();
+    } else if (collidesWithRight(eventX, eventY)) {
+      listener.turnRight();
+    } else if (collidesWithUp(eventX, eventY)) {
+      listener.turnUp();
+    } else if (collidesWithDown(eventX, eventY)) {
+      listener.turnDown();
+    }
+  }
+
+  function collidesWithLeft(x, y) {
+    return collidesWithControl(left, x, y);
+  }
+
+  function collidesWithRight(x, y) {
+    return collidesWithControl(right, x, y);
+  }
+
+  function collidesWithUp(x, y) {
+    return collidesWithControl(up, x, y);
+  }
+
+  function collidesWithDown(x, y) {
+    return collidesWithControl(down, x, y);
+  }
+
+  function collidesWithControl(control, x, y) {
+    var xCollides = control.x <= x && x <= control.x + SIZE;
+    var yCollides = control.y <= y && y <= control.y + SIZE;
+    return xCollides && yCollides;
+  }
+
+  this.draw = function(context) {
+    context.fillStyle = 'rgba(0, 0, 0, 0.1)';
+
+    context.fillRect(left.x, left.y, SIZE, SIZE);
+    context.fillRect(right.x, right.y, SIZE, SIZE);
+    context.fillRect(up.x, up.y, SIZE, SIZE);
+    context.fillRect(down.x, down.y, SIZE, SIZE);
+  }
+}
+
 function ResetButton(canvas, game) {
   this.x = 10;
   this.y = canvas.height - 50;
@@ -114,30 +189,30 @@ function Snake() {
     function keyPress(e) {
       var code = e.keyCode;
       switch (code) {
-        case 37: turnLeft(); break;
-        case 38: turnUp(); break;
-        case 39: turnRight(); break;
-        case 40: turnDown(); break;
+        case 37: snake.turnLeft(); break;
+        case 38: snake.turnUp(); break;
+        case 39: snake.turnRight(); break;
+        case 40: snake.turnDown(); break;
       }
     }
   }
 
-  function turnLeft() {
+  this.turnLeft = function() {
     if (snake.direction !== Direction.RIGHT)
       snake.direction = Direction.LEFT;
   };
 
-  function turnRight() {
+  this.turnRight = function() {
     if (snake.direction !== Direction.LEFT)
       snake.direction = Direction.RIGHT;
   };
 
-  function turnUp() {
+  this.turnUp = function() {
     if (snake.direction !== Direction.DOWN)
       snake.direction = Direction.UP;
   };
 
-  function turnDown() {
+  this.turnDown = function() {
     if (snake.direction !== Direction.UP)
       snake.direction = Direction.DOWN;
   };
@@ -180,6 +255,7 @@ function SnakeGame(canvas) {
   var apple = new Apple(canvas);
   var btnReset = new ResetButton(canvas, this);
   var score = new Score();
+  var controls = null;
 
   var context = canvas.getContext('2d');
 
@@ -196,6 +272,10 @@ function SnakeGame(canvas) {
 
     btnReset.updateLocation();
 
+    if (controls !== null) {
+      controls.updateLocation();
+    }
+
     drawGame();
   };
 
@@ -208,10 +288,18 @@ function SnakeGame(canvas) {
     score.reset();
   };
 
+  this.enableControls = function() {
+    controls = new Controls(canvas);
+    controls.register(snake);
+  }
+
   this.play = function() {
     btnReset.listen();
-
     snake.listenForKeyPress();
+
+    if (controls !== null) {
+      controls.listen();
+    }
 
     // game loop timing
     if (window.requestAnimationFrame !== null) {
@@ -282,5 +370,9 @@ function SnakeGame(canvas) {
     score.draw(context);
 
     btnReset.draw(context);
+
+    if (controls !== null) {
+      controls.draw(context);
+    }
   }
 }
