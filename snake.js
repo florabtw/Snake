@@ -77,6 +77,13 @@ function Snake() {
   this.points = [new Point(50, 50)];
   this.direction = Direction.RIGHT;
 
+  var snake = this;
+
+  this.reset = function() {
+    this.points = [new Point(50, 50)];
+    this.direction = Direction.RIGHT;
+  }
+
   this.headCollidesWithWall = function(canvas) {
     var head = this.points[0];
     var xCollides = 0 > head.x || head.x > canvas.width - 10;
@@ -100,24 +107,38 @@ function Snake() {
     return head.x === apple.x && head.y === apple.y;
   };
 
-  this.turnLeft = function() {
-    if (this.direction !== Direction.RIGHT)
-      this.direction = Direction.LEFT;
+  this.listenForKeyPress = function() {
+    window.addEventListener('keydown', keyPress, false);
+
+    function keyPress(e) {
+      var code = e.keyCode;
+      switch (code) {
+        case 37: turnLeft(); break;
+        case 38: turnUp(); break;
+        case 39: turnRight(); break;
+        case 40: turnDown(); break;
+      }
+    }
+  }
+
+  function turnLeft() {
+    if (snake.direction !== Direction.RIGHT)
+      snake.direction = Direction.LEFT;
   };
 
-  this.turnRight = function() {
-    if (this.direction !== Direction.LEFT)
-      this.direction = Direction.RIGHT;
+  function turnRight() {
+    if (snake.direction !== Direction.LEFT)
+      snake.direction = Direction.RIGHT;
   };
 
-  this.turnUp = function() {
-    if (this.direction !== Direction.DOWN)
-      this.direction = Direction.UP;
+  function turnUp() {
+    if (snake.direction !== Direction.DOWN)
+      snake.direction = Direction.UP;
   };
 
-  this.turnDown = function() {
-    if (this.direction !== Direction.UP)
-      this.direction = Direction.DOWN;
+  function turnDown() {
+    if (snake.direction !== Direction.UP)
+      snake.direction = Direction.DOWN;
   };
 
   this.draw = function(context) {
@@ -178,26 +199,15 @@ function SnakeGame(canvas) {
     gameOver = false;
     time = Date.now();
 
-    snake = new Snake();
+    snake.reset();
     apple.move();
     score.reset();
   };
 
   this.play = function() {
-    // listen for reset button
     btnReset.listen();
 
-    // listen for key presses
-    window.addEventListener('keydown', keyPress, false);
-    function keyPress(e) {
-      var code = e.keyCode;
-      switch (code) {
-        case 37: snake.turnLeft(); break;
-        case 38: snake.turnUp(); break;
-        case 39: snake.turnRight(); break;
-        case 40: snake.turnDown(); break;
-      }
-    }
+    snake.listenForKeyPress();
 
     // game loop timing
     if (window.requestAnimationFrame !== null) {
