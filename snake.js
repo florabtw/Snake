@@ -1,4 +1,5 @@
 var time = Date.now();
+var gameOver = false;
 
 var Direction = {
   LEFT: 0,
@@ -16,7 +17,14 @@ function Snake() {
   this.points = [new Point(50, 50), new Point(40, 50), new Point(30, 50)];
   this.direction = Direction.RIGHT;
 
-  this.headCollidesWith = function(apple){
+  this.headCollidesWithWall = function(canvas) {
+    var head = this.points[0];
+    var xCollides = 0 > head.x || head.x > canvas.width - 10;
+    var yCollides = 0 > head.y || head.y > canvas.height - 10;
+    return xCollides || yCollides;
+  };
+
+  this.headCollidesWithApple = function(apple){
     var head = this.points[0];
     return head.x === apple.x && head.y === apple.y;
   };
@@ -107,8 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // game loop
   function mainloop() {
-    updateSnake();
-    drawSnake();
+    if (!gameOver) {
+      updateSnake();
+      drawSnake();
+    }
   }
 
   function updateSnake() {
@@ -117,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (newTime - time > 50) {
       time = newTime;
 
-      if (snake.headCollidesWith(apple)) {
+      if (snake.headCollidesWithApple(apple)) {
         var last = snake.points[snake.points.length-1];
         snake.points.push(new Point(last.x, last.y));
 
@@ -139,6 +149,10 @@ document.addEventListener('DOMContentLoaded', function() {
         snake.points[0].y -= 10;
       } else {
         snake.points[0].y += 10;
+      }
+
+      if (snake.headCollidesWithWall(canvas)) {
+        gameOver = true;
       }
     }
   }
