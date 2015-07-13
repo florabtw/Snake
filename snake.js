@@ -183,22 +183,6 @@ function Snake() {
     return head.x === apple.x && head.y === apple.y;
   };
 
-  this.listenForKeyPress = function(canvas) {
-    canvas.addEventListener('keydown', keyPress);
-
-    function keyPress(e) {
-      e.preventDefault();
-
-      var code = e.keyCode;
-      switch (code) {
-        case 37: snake.turnLeft(); break;
-        case 38: snake.turnUp(); break;
-        case 39: snake.turnRight(); break;
-        case 40: snake.turnDown(); break;
-      }
-    }
-  }
-
   this.turnLeft = function() {
     if (snake.points.length === 1 || snake.points[1].x === snake.points[0].x)
       snake.direction = Direction.LEFT;
@@ -218,6 +202,24 @@ function Snake() {
     if (snake.points.length === 1 || snake.points[1].y === snake.points[0].y)
       snake.direction = Direction.DOWN;
   };
+
+  var keyMap = {
+    '37': this.turnLeft,
+    '38': this.turnUp,
+    '39': this.turnRight,
+    '40': this.turnDown
+  };
+
+  this.listenForKeyPress = function(canvas) {
+    canvas.addEventListener('keydown', function(e) {
+      var code = e.keyCode;
+
+      if (37 <= code && code <= 40) {
+        e.preventDefault();
+        keyMap[code]();
+      }
+    });
+  }
 
   this.draw = function(context) {
     context.fillStyle = 'black';
