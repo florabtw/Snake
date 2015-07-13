@@ -183,10 +183,12 @@ function Snake() {
     return head.x === apple.x && head.y === apple.y;
   };
 
-  this.listenForKeyPress = function() {
-    window.addEventListener('keydown', keyPress, false);
+  this.listenForKeyPress = function(canvas) {
+    canvas.addEventListener('keydown', keyPress);
 
     function keyPress(e) {
+      e.preventDefault();
+
       var code = e.keyCode;
       switch (code) {
         case 37: snake.turnLeft(); break;
@@ -295,7 +297,7 @@ function SnakeGame(canvas) {
 
   this.play = function() {
     btnReset.listen();
-    snake.listenForKeyPress();
+    snake.listenForKeyPress(canvas);
 
     if (controls !== null) {
       controls.listen();

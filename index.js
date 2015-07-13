@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.querySelector('#screen');
+  canvas.focus();
 
   var game = new SnakeGame(canvas);
   game.enableControls();
