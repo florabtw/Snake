@@ -2,9 +2,22 @@ The popular Snake game, built in JS for HTML5 Canvas.
 
 Meant to be played using arrow keys.
 
-The `index.*` files in this repo are a demonstration of Snake being played in a full-page canvas.
+# Demo
 
-# Instructions
+You can see an online version of the demo running [here](http://nickpierson.me/snake).
+
+To get the demo working yourself, first clone the repository:
+
+    $ git clone git@github.com:ncpierson/Snake.git
+    $ cd Snake
+
+Then, run a server from the root directory. Python can do this pretty easily:
+
+    $ python -m SimpleHTTPServer
+
+Lastly, navigate to the demo page. If you used python, go here: [localhost:8000/demo](http://localhost:8000/demo).
+
+# Embedded
 
 ### Download
 
