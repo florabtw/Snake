@@ -200,22 +200,22 @@ function Snake() {
   }
 
   this.turnLeft = function() {
-    if (snake.direction !== Direction.RIGHT)
+    if (snake.points.length === 1 || snake.points[1].x === snake.points[0].x)
       snake.direction = Direction.LEFT;
   };
 
   this.turnRight = function() {
-    if (snake.direction !== Direction.LEFT)
+    if (snake.points.length === 1 || snake.points[1].x === snake.points[0].x)
       snake.direction = Direction.RIGHT;
   };
 
   this.turnUp = function() {
-    if (snake.direction !== Direction.DOWN)
+    if (snake.points.length === 1 || snake.points[1].y === snake.points[0].y)
       snake.direction = Direction.UP;
   };
 
   this.turnDown = function() {
-    if (snake.direction !== Direction.UP)
+    if (snake.points.length === 1 || snake.points[1].y === snake.points[0].y)
       snake.direction = Direction.DOWN;
   };
 
