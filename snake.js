@@ -37,13 +37,30 @@ function Controls(canvas) {
   }
 
   this.listen = function() {
-    window.addEventListener('mousedown', checkForClick, false);
+    canvas.addEventListener('touchstart', checkForTouch);
+    canvas.addEventListener('click', checkForClick);
+  }
+
+  var touched = false;
+  function checkForTouch(e) {
+    touched = true;
+
+    var eventX = e.touches[0].pageX - canvas.offsetLeft;
+    var eventY = e.touches[0].pageY - canvas.offsetTop;
+
+    checkForCollision(eventX, eventY);
   }
 
   function checkForClick(e) {
+    if (touched) return;
+
     var eventX = e.pageX - canvas.offsetLeft;
     var eventY = e.pageY - canvas.offsetTop;
 
+    return checkForCollision(eventX, eventY);
+  }
+
+  function checkForCollision(eventX, eventY) {
     if (collidesWithLeft(eventX, eventY)) {
       listener.turnLeft();
     } else if (collidesWithRight(eventX, eventY)) {
@@ -100,7 +117,7 @@ function ResetButton(canvas, game) {
   };
 
   this.listen = function() {
-    window.addEventListener('mousedown', checkForClick, false);
+    canvas.addEventListener('click', checkForClick, false);
   };
 
   function checkForClick(e) {
